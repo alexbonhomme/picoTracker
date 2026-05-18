@@ -23,8 +23,7 @@
 #define DISPLAY_RESET 22
 #define DISPLAY_SCK 26
 #define DISPLAY_MOSI 27
-#define DISPLAY_MISO 28
-#define DISPLAY_PWM 23
+#define DISPLAY_PWM 28
 
 // MIDI
 #define MIDI_BAUD_RATE 31250
