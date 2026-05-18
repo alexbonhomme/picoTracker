@@ -136,8 +136,8 @@ void ThemeImportView::changeSelection(int delta) {
     size_t offset = (target > bottom) ? LIST_PAGE_SIZE - 1 : 0;
     size_t upper = fileIndexList_.size() > LIST_PAGE_SIZE
                        ? fileIndexList_.size() - LIST_PAGE_SIZE
-                       : 0zu;
-    size_t base = target > offset ? target - offset : 0zu;
+                       : 0;
+    size_t base = target > offset ? target - offset : 0;
     topIndex_ = std::min(base, upper);
   }
 
