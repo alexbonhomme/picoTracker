@@ -153,10 +153,17 @@ unsigned long picoTrackerSystem::GetClock() {
 
 void picoTrackerSystem::GetBatteryState(BatteryState &state) {
   uint32_t adc_reading = adc_read(); // raw voltage from ADC
-  // 0.8mV per unit of ADC
-  // * 2 because picoTracker use voltage divider for voltage on ADC pin
+
+#if PICO_RP2350
+  // Pico 2 module: VSYS is divided by 3 before ADC (see Pico 2 datasheet).
+  // 12-bit ADC, 3.3 V reference: VSYS_mV = reading * 3300 * 3 / 4096
+  state.voltage_mv = (adc_reading * 9900 + 2048) / 4096;
+#else
+  // picoTracker PCB: external 2:1 divider on BATT_VOLTAGE_IN pin.
+  // 0.8mV per unit of ADC * 2
   // mV =^= adc_reading * 1.6
   state.voltage_mv = (adc_reading * 8) / 5; // equals adc_reading * 1.6;
+#endif
 
   // clamp the ends of the valid voltage range
   if (state.voltage_mv < 3325) {
