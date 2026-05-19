@@ -123,7 +123,7 @@ void picoTrackerSystem::Boot(int argc, char **argv) {
   eventManager_ = I_GUIWindowFactory::GetInstance()->GetEventManager();
   eventManager_->Init();
 
-#if PICO_RP2040
+#if PICO_RP2040 || PICO_RP2350
   // init GPIO for use as ADC: hi-Z, no pullups, etc
   adc_gpio_init(BATT_VOLTAGE_IN);
 
