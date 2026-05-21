@@ -1020,13 +1020,16 @@ void TableView::AnimationUpdate() {
 
 void TableView::printHelpLegend(FourCC command, GUITextProperties props) {
   char **helpLegend = getHelpLegend(command);
-  char line[32]; //-1 for 1char space start of line
-  strcpy(line, " ");
-  strcpy(line, helpLegend[0]);
+  // Buffer must be large enough to hold any help-legend string.
+  // Longest string today: "Shift loop start & end values aaaa" (34 chars + NUL).
+  char line[40];
+  strncpy(line, helpLegend[0], sizeof(line) - 1);
+  line[sizeof(line) - 1] = '\0';
   DrawString(0, 0, line, props);
-  memset(line, ' ', 32);
+  memset(line, ' ', sizeof(line));
   if (helpLegend[1] != NULL) {
-    strcpy(line, helpLegend[1]);
+    strncpy(line, helpLegend[1], sizeof(line) - 1);
+    line[sizeof(line) - 1] = '\0';
     DrawString(0, 1, line, props);
   }
 }

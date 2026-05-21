@@ -51,7 +51,7 @@ PhraseView::PhraseView(GUIWindow &w, ViewData *viewData)
   };
 }
 
-PhraseView::~PhraseView(){};
+PhraseView::~PhraseView() {};
 
 void PhraseView::Reset() {
   phrase_ = &(viewData_->song_->phrase_);
@@ -1530,17 +1530,23 @@ void PhraseView::printHelpLegend(FourCC command, GUITextProperties props) {
   }
 
   char **helpLegend = getHelpLegend(command);
-  char line[32]; //-1 for 1char space start of line
+  // Buffer must be large enough to hold any help-legend string.
+  // Longest string today: "Shift loop start & end values aaaa" (34 chars +
+  // NUL).
+  char line[40];
+
   // first clear top line upto battery gauge
   DrawString(0, 0, "                           ", props);
   // TODO: use ClearTextRect instead of DrawString() once it is implemented
   // ClearTextRect(0, 0, SCREEN_WIDTH - BATTERY_GAUGE_WIDTH, 0);
-  strcpy(line, " ");
-  strcpy(line, helpLegend[0]);
+  strncpy(line, helpLegend[0], sizeof(line) - 1);
+  line[sizeof(line) - 1] = '\0';
   DrawString(0, 0, line, props);
-  memset(line, ' ', 32);
+  memset(line, ' ', sizeof(line));
   if (helpLegend[1] != NULL) {
-    strcpy(line, helpLegend[1]);
+    strncpy(line, helpLegend[1], sizeof(line) - 1);
+    line[sizeof(line) - 1] = '\0';
+
     DrawString(0, 1, line, props);
   }
 }
