@@ -124,10 +124,11 @@ void picoTrackerSystem::Boot(int argc, char **argv) {
   eventManager_->Init();
 
 #if PICO_RP2040 || PICO_RP2350
-  // init GPIO for use as ADC: hi-Z, no pullups, etc
-  adc_gpio_init(BATT_VOLTAGE_IN);
-
+  // Order matters: enable the ADC block first, then configure the pin as a
+  // high-Z analog input, then select the input channel.
   adc_init();
+
+  adc_gpio_init(BATT_VOLTAGE_IN);
 
   // select analog MUX, GPIO 26=0, 27=1, 28=1, 29=3
   adc_select_input(3);
@@ -152,11 +153,24 @@ unsigned long picoTrackerSystem::GetClock() {
 }
 
 void picoTrackerSystem::GetBatteryState(BatteryState &state) {
-  uint32_t adc_reading = adc_read(); // raw voltage from ADC
-  // 0.8mV per unit of ADC
-  // * 2 because picoTracker use voltage divider for voltage on ADC pin
-  // mV =^= adc_reading * 1.6
-  state.voltage_mv = (adc_reading * 8) / 5; // equals adc_reading * 1.6;
+  // Battery ADC is read ~once/s, so discard stale first samples then average
+  // the rest (idle ADC reads low; averaging also smooths supply ripple).
+  constexpr int kAdcIgnoreSamples = 3;
+  constexpr int kAdcAverageSamples = 4;
+
+  adc_select_input(3); // ensure VSYS/BATT_VOLTAGE_DIVIDER is the selected channel (GPIO29)
+  for (int i = 0; i < kAdcIgnoreSamples; ++i) {
+    (void)adc_read();
+  }
+  uint32_t adc_sum = 0;
+  for (int i = 0; i < kAdcAverageSamples; ++i) {
+    adc_sum += adc_read();
+  }
+  uint32_t adc_reading = adc_sum / kAdcAverageSamples;
+
+  // Reconstruct VSYS in millivolts.
+  state.voltage_mv =
+      (adc_reading * 3300u * BATT_VOLTAGE_DIVIDER + 2048u) / 4096u;
 
   // clamp the ends of the valid voltage range
   if (state.voltage_mv < 3325) {
