@@ -412,7 +412,8 @@ sdio_status_t rp2040_sdio_rx_start(uint8_t *buffer, uint32_t num_blocks) {
 
   // Enable RX FIFO join because we don't need the TX FIFO during transfer.
   // This gives more leeway for the DMA block switching
-  SDIO_PIO->sm[SDIO_DATA_SM].shiftctrl |= PIO_SM0_SHIFTCTRL_FJOIN_RX_BITS;
+  SDIO_PIO->sm[SDIO_DATA_SM].shiftctrl =
+      SDIO_PIO->sm[SDIO_DATA_SM].shiftctrl | PIO_SM0_SHIFTCTRL_FJOIN_RX_BITS;
 
   // Start PIO and DMA
   dma_channel_start(SDIO_DMA_CHB);
@@ -779,7 +780,7 @@ void rp2040_sdio_init(int clock_divider) {
   // This reduces input delay.
   // Because the CLK is driven synchronously to CPU clock,
   // there should be no metastability problems.
-  SDIO_PIO->input_sync_bypass |= (1 << SDIO_CLK) | (1 << SDIO_CMD) |
+  SDIO_PIO->input_sync_bypass = SDIO_PIO->input_sync_bypass | (1 << SDIO_CLK) | (1 << SDIO_CMD) |
                                  (1 << SDIO_D0) | (1 << SDIO_D1) |
                                  (1 << SDIO_D2) | (1 << SDIO_D3);
 

@@ -44,6 +44,16 @@ add_definitions(-DLOAD_IN_FLASH)
 # define to use battery level as percentage instead of battery level as "+" bars
 #add_definitions(-DBATTERY_LEVEL_AS_PERCENTAGE)
 
+# Override the VSYS->BATT_VOLTAGE_IN divider ratio if your RP2350 module
+# differs from the official Raspberry Pi Pico 2 (which divides VSYS by 3).
+# Examples:
+#   cmake -DBATT_VOLTAGE_DIVIDER=5 ...   (Aliexpress RP2350 clone)
+#   cmake -DBATT_VOLTAGE_DIVIDER=1 ...   (no divider, direct VSYS feed)
+# Defaults are set in sources/Adapters/picoTracker/platform/gpio.h.
+if(DEFINED BATT_VOLTAGE_DIVIDER)
+  add_definitions(-DBATT_VOLTAGE_DIVIDER=${BATT_VOLTAGE_DIVIDER})
+endif()
+
 #disabled for now as USB **input** is not yet fully implemented
 #add_definitions(USB_REMOTE_UI_INPUT)
 # ST7789 controller based LCD instead of a ILI9341 controller
