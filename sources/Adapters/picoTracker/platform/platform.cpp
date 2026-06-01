@@ -141,9 +141,7 @@ void platform_init() {
   pwm_set_clkdiv(slice_num, 220.5 * KHZ);
   // Set period of 256 cycles (0 to 255 inclusive)
   pwm_set_wrap(slice_num, 255);
-  // Set channel A output high for one cycle before dropping
-  pwm_set_chan_level(slice_num, PWM_CHAN_B, 256);
-  // Set the PWM running
+  pwm_set_gpio_level(DISPLAY_PWM, 255);
   pwm_set_enabled(slice_num, true);
 
   // Chip select is active-low, so we'll initialise it to a driven-high state
