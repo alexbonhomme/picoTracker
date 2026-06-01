@@ -12,6 +12,18 @@
 // POWER
 #define BATT_VOLTAGE_IN 29
 
+// Ratio between VSYS (or the raw battery voltage) and the voltage actually
+// seen at BATT_VOLTAGE_IN.
+#ifndef BATT_VOLTAGE_DIVIDER
+#if PICO_RP2040
+// picoTracker PCB has an external 2:1 divider on BATT_VOLTAGE_IN.
+#define BATT_VOLTAGE_DIVIDER 2
+#elif PICO_RP2350
+// Official Raspberry Pi Pico 2 module: GPIO29 sees VSYS/3 internally.
+#define BATT_VOLTAGE_DIVIDER 3
+#endif
+#endif
+
 // I2C
 // None for now
 
